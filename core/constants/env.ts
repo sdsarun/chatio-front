@@ -1,7 +1,6 @@
 import { parseYupValidationError } from '@/core/utils/common/yup';
 import * as yup from 'yup';
 
-// Environment Configuration Type
 export type Env = {
   isProduction: boolean;
   isDevelopment: boolean;
@@ -20,7 +19,7 @@ const envSchema = yup.object({
   googleSecret: yup.string().required('Google Client Secret is required').min(1, 'Google Client Secret cannot be empty')
 }).required();
 
-function validateEnv(env: Env): Env {
+function validateEnvAndFreeze(env: Env): Readonly<Env> {
   try {
     envSchema.validateSync(env, { abortEarly: false });
     return Object.freeze(env);
@@ -50,7 +49,6 @@ function validateEnv(env: Env): Env {
   }
 }
 
-// Create Environment Configuration
 const env: Env = {
   isProduction: process.env.NODE_ENV === "production",
   isDevelopment: process.env.NODE_ENV === "development",
@@ -60,5 +58,4 @@ const env: Env = {
   googleSecret: process.env.AUTH_GOOGLE_SECRET || ""
 };
 
-// Export validated and frozen environment configuration
-export default validateEnv(env);
+export default validateEnvAndFreeze(env);
