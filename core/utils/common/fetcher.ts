@@ -76,7 +76,7 @@ export default function fetcherFactory(
 
     // Throw an error if the response status is not OK
     if (!response.ok) {
-      console.log(`HTTP Error: ${response.status} ${response.statusText}`);
+      console.error(`HTTP Error: ${response.status} ${response.statusText}`);
     }
 
     // Log response details if log is enabled
