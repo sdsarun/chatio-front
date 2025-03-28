@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/core/components/providers/theme";
-import QueryProvider from "@/core/components/providers/query";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"]
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"]
-});
+import Providers from "@/core/components/providers/providers";
+import { notoSans, notoSansMono } from "@/core/configs/fonts";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "ChatIO",
@@ -25,13 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <QueryProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-        </QueryProvider>
+    <html className={`${notoSans.variable} ${notoSansMono.variable}`} lang="en" suppressHydrationWarning>
+      <body className={`antialiased`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
