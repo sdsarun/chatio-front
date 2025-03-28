@@ -1,27 +1,35 @@
-import { parseYupValidationError } from '@/core/utils/common/yup';
-import * as yup from 'yup';
+import { parseYupValidationError } from "@/core/utils/common/yup";
+import * as yup from "yup";
 
-export type Env = {
-  isProduction: boolean;
-  isDevelopment: boolean;
-  isTest: boolean;
-  hostChatIOBackend: string;
-  googleId: string;
-  googleSecret: string;
-};
+const publicEnvSchema = yup
+  .object({
+    hostChatioBackend: yup.string().required("Public Host backend URL is required")
+  })
+  .required();
 
-const envSchema = yup.object({
-  isProduction: yup.boolean().required(),
-  isDevelopment: yup.boolean().required(),
-  isTest: yup.boolean().required(),
-  hostChatIOBackend: yup.string().required('Host backend URL is required'),
-  googleId: yup.string().required('Google Client ID is required').min(1, 'Google Client ID cannot be empty'),
-  googleSecret: yup.string().required('Google Client Secret is required').min(1, 'Google Client Secret cannot be empty')
-}).required();
+const privateEnvSchema = yup
+  .object({
+    googleId: yup
+      .string()
+      .required("Google Client ID is required")
+      .min(1, "Google Client ID cannot be empty"),
+    googleSecret: yup
+      .string()
+      .required("Google Client Secret is required")
+      .min(1, "Google Client Secret cannot be empty")
+  })
+  .required();
 
-function validateEnvAndFreeze(env: Env): Readonly<Env> {
+export type PublicEnv = yup.InferType<typeof publicEnvSchema>;
+export type PrivateEnv = yup.InferType<typeof privateEnvSchema>;
+
+function validateEnvAndFreeze<T extends yup.AnyObject>(
+  env: T,
+  schema: yup.ObjectSchema<T>
+): Readonly<T> {
+  console.log("[LOG] - env.ts:30 - env:", env)
   try {
-    envSchema.validateSync(env, { abortEarly: false });
+    schema.validateSync(env, { abortEarly: false });
     return Object.freeze(env);
   } catch (error) {
     if (error instanceof yup.ValidationError) {
@@ -29,33 +37,48 @@ function validateEnvAndFreeze(env: Env): Readonly<Env> {
         (err) => `\x1b[31mMissing: ${err}\x1b[0m`
       );
 
-       const errorMessage = [
-        '\x1b[31m🚨 Environment Configuration Validation Failed 🚨\x1b[0m',
-        '',
+      const errorMessage = [
+        "\x1b[31m🚨 Environment Configuration Validation Failed 🚨\x1b[0m",
+        "",
         ...validationErrors,
-        '',
-        '\x1b[33mTroubleshooting:\x1b[0m',
-        '\x1b[33m- Ensure all required environment variables are set\x1b[0m',
-        '\x1b[33m- Verify the values are correct and not empty\x1b[0m',
-        '\x1b[33m- Check your .env file or deployment configuration\x1b[0m',
-        '',
-      ].join('\n');
-      
+        "",
+        "\x1b[33mTroubleshooting:\x1b[0m",
+        "\x1b[33m- Ensure all required environment variables are set\x1b[0m",
+        "\x1b[33m- Verify the values are correct and not empty\x1b[0m",
+        "\x1b[33m- Check your .env file or deployment configuration\x1b[0m",
+        ""
+      ].join("\n");
+
       console.error(errorMessage);
-      
-      throw new Error('Invalid environment configuration');
+
+      throw new Error("Invalid environment configuration");
     }
     throw error;
   }
 }
 
-const env: Env = {
-  isProduction: process.env.NODE_ENV === "production",
-  isDevelopment: process.env.NODE_ENV === "development",
-  isTest: process.env.NODE_ENV === "test",
-  hostChatIOBackend: process.env.HOST_CHATIO_BACKEND_URL || "http://localhost:3301",
-  googleId: process.env.AUTH_GOOGLE_ID || "",
-  googleSecret: process.env.AUTH_GOOGLE_SECRET || ""
-};
+const publicEnv = validateEnvAndFreeze(
+  {
+    hostChatioBackend: process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL || "http://localhost:3301"
+  },
+  publicEnvSchema
+);
 
-export default validateEnvAndFreeze(env);
+let privateEnv: PrivateEnv | undefined;
+if (typeof window === "undefined") {
+  privateEnv = validateEnvAndFreeze(
+    {
+      googleId: process.env.AUTH_GOOGLE_ID || "",
+      googleSecret: process.env.AUTH_GOOGLE_SECRET || ""
+    },
+    privateEnvSchema
+  );
+}
+
+const isProduction: boolean = process.env.NODE_ENV === "production";
+const isDevelopment: boolean = process.env.NODE_ENV === "development";
+const isTest: boolean = process.env.NODE_ENV === "test";
+
+export { publicEnv };
+export { privateEnv };
+export { isProduction, isDevelopment, isTest };
