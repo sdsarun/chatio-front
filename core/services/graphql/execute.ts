@@ -1,5 +1,6 @@
 import { chatioGraphQLApi } from '@/core/services/api'
 import type { TypedDocumentString } from './graphql'
+import type { ExecutionResult } from 'graphql'
  
 export async function executeGraphQL<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
@@ -17,5 +18,5 @@ export async function executeGraphQL<TResult, TVariables>(
     throw new Error(`GraphQL query failed with status: ${response.status} - ${response.statusText}`)
   }
  
-  return response.json() as TResult
+  return response.json() as ExecutionResult<TResult>
 }
