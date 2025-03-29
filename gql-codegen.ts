@@ -4,7 +4,7 @@ import { loadEnvConfig } from "@next/env"
 loadEnvConfig(process.cwd());
 
 const config: CodegenConfig = {
-  schema: `${process.env.HOST_CHATIO_BACKEND_URL}/graphql`,
+  schema: `${process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL}/graphql`,
   documents: ['core/**/*.tsx', 'features/**/*.tsx'],
   ignoreNoDocuments: true,
   generates: {
