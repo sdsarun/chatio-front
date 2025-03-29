@@ -27,7 +27,6 @@ function validateEnvAndFreeze<T extends yup.AnyObject>(
   env: T,
   schema: yup.ObjectSchema<T>
 ): Readonly<T> {
-  console.log("[LOG] - env.ts:30 - env:", env)
   try {
     schema.validateSync(env, { abortEarly: false });
     return Object.freeze(env);
