@@ -5,7 +5,7 @@ loadEnvConfig(process.cwd());
 
 const config: CodegenConfig = {
   schema: `${process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL}/graphql`,
-  documents: ['core/**/*.tsx', 'features/**/*.tsx'],
+  documents: ['core/**/*.{ts,tsx}', 'features/**/*.{ts,tsx}'],
   ignoreNoDocuments: true,
   generates: {
     './core/services/graphql/': {
