@@ -8,3 +8,4 @@ export const chatioGraphQLApi = fetcherFactory(publicEnv.hostChatioBackend, {
     Accept: 'application/graphql-response+json'
   }
 });
+export const chatioRestApi = fetcherFactory(publicEnv.hostChatioBackend);
