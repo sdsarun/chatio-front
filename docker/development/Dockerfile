@@ -48,4 +48,4 @@ EXPOSE 3300
 
 ENV PORT=3300
 
-CMD node server.js
+CMD HOSTNAME="0.0.0.0" node server.js
