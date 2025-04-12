@@ -5,9 +5,9 @@ schema {
 
 input CreateUserIfNotExistsInput {
   aka: String
-  gender: UserGenderType!
+  gender: UserGenderType
   role: UserRoleType!
-  username: String!
+  username: String
 }
 
 """
@@ -17,10 +17,16 @@ scalar DateTime
 
 type Mutation {
   createUserIfNotExists(createUserIfNotExistsInput: CreateUserIfNotExistsInput!): User!
+  updateUserProfile(id: ID!, updateUserData: UpdateUserProfileInput!): User!
 }
 
 type Query {
   user(aka: String, userId: ID, username: String): User
+}
+
+input UpdateUserProfileInput {
+  aka: String
+  gender: UserGenderType
 }
 
 type User {
@@ -31,6 +37,7 @@ type User {
   isActive: Boolean
   updatedAt: DateTime
   userGender: UserGender
+  userGenderId: String
   userRole: UserRole
   userRoleId: String
   username: String!

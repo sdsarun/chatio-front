@@ -1,10 +1,44 @@
-import { googleOAuthApi } from "@/core/services/api";
+// core
+import { type JWT } from "next-auth/jwt";
 import NextAuth from "next-auth";
-import { JWT } from "next-auth/jwt";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import { NextResponse } from "next/server";
+import { jwtDecode } from "jwt-decode"
+
+// api
+import { googleOAuthApi } from "@/core/services/api";
+import { googleSignIn } from "@/core/services/auth/actions/google-signin";
+import { guestSignIn } from "@/core/services/auth/actions/guest-signin";
+
+// types
+import type { UserInfoQuery } from "@/core/services/graphql/graphql";
+
+const EXCLUDED_PATHS_REGEX: RegExp = /^\/(api|_next\/static|_next\/image|favicon\.ico|sitemap\.xml|robots\.txt)/;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Credentials({
+      type: "credentials",
+      id: "guest-credential",
+      name: "Guest Credential",
+      async authorize() {
+        const response = await guestSignIn();
+        if (response.success) {
+          const { accessToken, accessTokenExpInMS } = response.data;
+          const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
+          return {
+            userInfo,
+            token: {
+              accessToken,
+              accessTokenExpInMS
+            }
+          } as any;
+        }
+
+        return null;
+      }
+    }),
     Google({
       authorization: {
         params: {
@@ -16,31 +50,136 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   pages: {
-    signIn: "/"
+    signIn: "/auth/signin",
+    newUser: "/auth/new-user",
   },
   callbacks: {
-    async authorized() {
-      // return !!auth?.user;
-      return true;
-    },
-    async signIn({}) {
-      return true;
-    },
-    async jwt({ account, token }) {
-      if (account) {
-        token.idToken = account.id_token;
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.expiresAt = account.expires_at;
+    async authorized({ request, auth }) {
+      const { pathname, origin } = request.nextUrl;
+
+      // skip nextjs
+      if (EXCLUDED_PATHS_REGEX.test(pathname)) {
+        return true;
       }
-      // return token;
-      return refreshGoogleToken(token);
+
+      const isAuthenticated = !!auth?.user;
+
+      if (isAuthenticated) {
+        const userAuth = auth.user!;
+        const { accessTokenExpInMS } = auth.token!;
+
+        const isAccessTokenExpired = Date.now() > accessTokenExpInMS;
+        if (isAccessTokenExpired) {
+          return false;
+        }
+
+        // user can't access /signin
+        const bypassAuthenticatedPaths: string[] = ["/", "/auth", "/auth/signin"];
+        const isProtectedRoutes = pathname.startsWith("/c");
+
+        // user complete profile yet?
+        const isUserProfileCompleted: boolean = !!userAuth?.userGender;
+        if (!isUserProfileCompleted && (bypassAuthenticatedPaths.includes(pathname) || isProtectedRoutes)) {
+          if (pathname !== "/auth/onboarding") {
+            return NextResponse.redirect(new URL("/auth/onboarding", origin));
+          }
+        }
+
+        if (isUserProfileCompleted && pathname === "/auth/onboarding") {
+          return NextResponse.redirect(new URL("/c/new", origin));
+        }
+
+        if (isUserProfileCompleted && bypassAuthenticatedPaths.includes(pathname)) {
+          return NextResponse.redirect(new URL("/c/new", origin));
+        }
+      } else {
+        if (pathname.includes("/auth/onboarding")) {
+          return false;
+        }
+
+        if (pathname.startsWith("/c")) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    async signIn({ account, profile }) {
+      if (account) {
+        const { provider } = account;
+
+        switch (provider) {
+          case "google": {
+            const response = await googleSignIn({ idToken: account.id_token! });
+            if (response.success) {
+              const { accessToken, accessTokenExpInMS } = response.data;
+              const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
+
+              if (profile) {
+                profile.internal = {
+                  userInfo,
+                  token: {
+                    accessToken,
+                    accessTokenExpInMS
+                  }
+                }
+              }
+            } else {
+              return `/auth/signin?error=${response.message}`;
+            }
+            break;
+          }
+          case "guest-credential": {
+            break;
+          }
+        }
+      }
+
+      return true;
+    },
+    async jwt({ account, token, profile, trigger, session, user }) {
+      switch (trigger) {
+        case "update": {
+          (token as any).internal = {
+            ...token?.internal,
+            userInfo: {
+              ...token?.internal?.userInfo,
+              ...session
+            }
+          }
+          break;
+        }
+      }
+
+      if (account) {
+        const { provider } = account;
+        switch (provider) {
+          case "google": {
+            token.idToken = account.id_token;
+            token.accessToken = account.access_token;
+            token.refreshToken = account.refresh_token;
+            token.expiresAt = account.expires_at;
+            token.internal = profile?.internal
+            break;
+          }
+          case "guest-credential": {
+            (token as any).internal = user;
+            break;
+          }
+        }
+      }
+
+      if (account?.type === "oauth" && account.provider === "google") {
+        return await refreshGoogleToken(token);
+      }
+      return token;
     },
     async session({ session, token }) {
-      session.token = {
-        idToken: token.idToken,
-        expiresAt: token?.expiresAt || 0
-      };
+      if (token.internal) {
+        (session as any).user = token.internal.userInfo;
+        session.token = token.internal.token;
+      }
+
       return session;
     }
   }

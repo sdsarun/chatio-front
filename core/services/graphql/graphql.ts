@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -19,19 +20,26 @@ export type Scalars = {
 
 export type CreateUserIfNotExistsInput = {
   aka?: InputMaybe<Scalars['String']['input']>;
-  gender: UserGenderType;
+  gender?: InputMaybe<UserGenderType>;
   role: UserRoleType;
-  username: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   createUserIfNotExists: User;
+  updateUserProfile: User;
 };
 
 
 export type MutationCreateUserIfNotExistsArgs = {
   createUserIfNotExistsInput: CreateUserIfNotExistsInput;
+};
+
+
+export type MutationUpdateUserProfileArgs = {
+  id: Scalars['ID']['input'];
+  updateUserData: UpdateUserProfileInput;
 };
 
 export type Query = {
@@ -46,6 +54,11 @@ export type QueryUserArgs = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateUserProfileInput = {
+  aka?: InputMaybe<Scalars['String']['input']>;
+  gender?: InputMaybe<UserGenderType>;
+};
+
 export type User = {
   __typename?: 'User';
   aka: Scalars['String']['output'];
@@ -55,6 +68,7 @@ export type User = {
   isActive?: Maybe<Scalars['Boolean']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   userGender?: Maybe<UserGender>;
+  userGenderId?: Maybe<Scalars['String']['output']>;
   userRole?: Maybe<UserRole>;
   userRoleId?: Maybe<Scalars['String']['output']>;
   username: Scalars['String']['output'];
@@ -83,6 +97,28 @@ export enum UserRoleType {
   Registered = 'REGISTERED'
 }
 
+export type CreateUserIfNotExistsMutationVariables = Exact<{
+  userData: CreateUserIfNotExistsInput;
+}>;
+
+
+export type CreateUserIfNotExistsMutation = { __typename?: 'Mutation', createUserIfNotExists: { __typename?: 'User', id: string, username: string, aka: string, userRoleId?: string | null, isActive?: boolean | null, userRole?: { __typename?: 'UserRole', id: string, name: string } | null, userGender?: { __typename?: 'UserGender', id: string, name: string } | null } };
+
+export type UpdateUserProfileMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  updateUserProfile: UpdateUserProfileInput;
+}>;
+
+
+export type UpdateUserProfileMutation = { __typename?: 'Mutation', updateUserProfile: { __typename?: 'User', id: string, username: string, aka: string, userRoleId?: string | null, isActive?: boolean | null, userRole?: { __typename?: 'UserRole', id: string, name: string } | null, userGender?: { __typename?: 'UserGender', id: string, name: string } | null } };
+
+export type UserInfoQueryVariables = Exact<{
+  username: Scalars['String']['input'];
+}>;
+
+
+export type UserInfoQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, username: string, aka: string, userRoleId?: string | null, isActive?: boolean | null, userRole?: { __typename?: 'UserRole', id: string, name: string } | null, userGender?: { __typename?: 'UserGender', name: string, id: string } | null } | null };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -101,3 +137,61 @@ export class TypedDocumentString<TResult, TVariables>
     return this.value;
   }
 }
+
+export const CreateUserIfNotExistsDocument = new TypedDocumentString(`
+    mutation CreateUserIfNotExists($userData: CreateUserIfNotExistsInput!) {
+  createUserIfNotExists(createUserIfNotExistsInput: $userData) {
+    id
+    username
+    aka
+    userRoleId
+    isActive
+    userRole {
+      id
+      name
+    }
+    userGender {
+      id
+      name
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<CreateUserIfNotExistsMutation, CreateUserIfNotExistsMutationVariables>;
+export const UpdateUserProfileDocument = new TypedDocumentString(`
+    mutation UpdateUserProfile($userId: ID!, $updateUserProfile: UpdateUserProfileInput!) {
+  updateUserProfile(id: $userId, updateUserData: $updateUserProfile) {
+    id
+    username
+    aka
+    userRoleId
+    isActive
+    userRole {
+      id
+      name
+    }
+    userGender {
+      id
+      name
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateUserProfileMutation, UpdateUserProfileMutationVariables>;
+export const UserInfoDocument = new TypedDocumentString(`
+    query UserInfo($username: String!) {
+  user(username: $username) {
+    id
+    username
+    aka
+    userRoleId
+    isActive
+    userRole {
+      id
+      name
+    }
+    userGender {
+      name
+      id
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UserInfoQuery, UserInfoQueryVariables>;
