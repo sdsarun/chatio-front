@@ -93,11 +93,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return NextResponse.redirect(new URL("/c/new", origin));
         }
       } else {
-        if (pathname.includes("/auth/onboarding")) {
-          return false;
-        }
-
-        if (pathname.startsWith("/c")) {
+        if (
+          pathname.includes("/auth/onboarding") ||
+          pathname.startsWith("/c") ||
+          pathname === "/"
+        ) {
           return false;
         }
       }
