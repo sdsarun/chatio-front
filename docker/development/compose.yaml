@@ -1,9 +1,9 @@
 services:
-  chatio-front-development:
+  chatio-front:
     build:
       context: ../../
       dockerfile: docker/development/Dockerfile
-    image: chatio-front-development
-    container_name: chatio-front-development
+    image: chatio-front-dev
+    container_name: chatio-front-dev
     ports:
       - "3300:3300"
