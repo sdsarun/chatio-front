@@ -82,7 +82,6 @@ export default function FormOnboarding({
 
   return (
     <Card className="w-[448px]">
-      {JSON.stringify(form.formState.errors.gender?.message)}
       <CardHeader>
         <CardTitle className='flex flex-col gap-4'>
           {errors.map(({ message }) => (
@@ -110,7 +109,6 @@ export default function FormOnboarding({
                       size={"lg"}
                       variant={form.watch("gender") === UserGenderType.Male ? "default" : "outline"}
                       onClick={() => field.onChange(UserGenderType.Male)}
-                      disabled={isPending}
                     >
                       <Mars />
                       Male
@@ -129,7 +127,6 @@ export default function FormOnboarding({
                       size={"lg"}
                       variant={form.watch("gender") === UserGenderType.Female ? "default" : "outline"}
                       onClick={() => field.onChange(UserGenderType.Female)}
-                      disabled={isPending}
                     >
                       <Venus />
                       Female
@@ -150,7 +147,6 @@ export default function FormOnboarding({
                         form.watch("gender") === UserGenderType.RatherNotSay ? "default" : "outline"
                       }
                       onClick={() => field.onChange(UserGenderType.RatherNotSay)}
-                      disabled={isPending}
                     >
                       <VenusAndMars />
                       Rather not say
