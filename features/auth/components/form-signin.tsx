@@ -1,8 +1,9 @@
 "use client";
 
 // core
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 // components
 import { Button } from "@/core/components/ui/button";
@@ -23,18 +24,22 @@ export type FormSignInProps = {
 };
 
 export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
-  const [isGoogleSignInPending, startGoogleSignInPending] = useTransition();
+  const router = useRouter();
+
+  const [socialSignInLoading, setSocialSignInLoading] = useState<string | null>(null);
   const [isGuestSignInPending, startGuestSignInPending] = useTransition();
 
   const handleSocialSignIn = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    startGoogleSignInPending(async () => {
-      await signIn(event.currentTarget.name, { redirect: !!callbackUrl, redirectTo: callbackUrl });
-    });
+    const providerName = event.currentTarget.name;
+    setSocialSignInLoading(providerName);
+    await signIn(providerName, { redirect: !!callbackUrl, redirectTo: callbackUrl });
   };
 
-  const handleCredentialSignIn = async () => {
+  const handleCredentialSignIn = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const providerName = event.currentTarget.name;
     startGuestSignInPending(async () => {
-      await signIn("guest-credential", { redirect: !!callbackUrl, redirectTo: callbackUrl });
+      await signIn(providerName, { redirect: !!callbackUrl, redirectTo: callbackUrl });
+      router.refresh();
     });
   };
 
@@ -58,7 +63,7 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
           variant={"outline"}
           size={"lg"}
           onClick={handleSocialSignIn}
-          isLoading={isGoogleSignInPending}
+          isLoading={socialSignInLoading === "google"}
         >
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="block">
             <path
@@ -81,13 +86,13 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
           </svg>
           Continue with Google
         </Button>
-        {/* <Button
+        <Button
           name="discord"
           className="w-full font-semibold"
           variant={"outline"}
           size={"lg"}
           onClick={handleSocialSignIn}
-          isLoading={isPending}
+          isLoading={socialSignInLoading === "discord"}
           hidden
         >
           <svg
@@ -107,7 +112,7 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
             />
           </svg>
           Continue with Discord
-        </Button> */}
+        </Button>
       </CardContent>
       <CardFooter className="flex flex-col justify-between gap-4">
         <div className="flex items-center gap-4 w-full">
@@ -115,10 +120,11 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
           <span className="text-muted-foreground text-sm">or</span>
           <Separator className="flex-1" />
         </div>
-        <Button 
-          className="w-full font-semibold" 
-          size={"lg"} 
-          onClick={handleCredentialSignIn} 
+        <Button
+          name="guest-credential"
+          className="w-full font-semibold"
+          size={"lg"}
+          onClick={handleCredentialSignIn}
           isLoading={isGuestSignInPending}
         >
           Continues with Guest
