@@ -20,11 +20,11 @@ import {
 } from "@/core/components/ui/card";
 import { Form, FormField, FormItem } from "@/core/components/ui/form";
 import { Separator } from "@/core/components/ui/separator";
-import { Alert, AlertDescription } from '@/core/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/core/components/ui/alert';
 import Link from "next/link";
 
 // icons
-import { Mars, Venus, VenusAndMars } from "lucide-react";
+import { AlertCircle, Mars, Venus, VenusAndMars } from "lucide-react";
 
 // api
 import { completeProfile } from '@/core/services/auth/actions/complete-profile';
@@ -34,7 +34,7 @@ import { UserGenderType } from '@/core/services/graphql/graphql';
 
 // types
 import type { Session } from 'next-auth';
-import type { GraphQLError } from 'graphql';
+import type { ServerActionError } from '@/core/types/server-action';
 
 export type FormOnboardingProps = {
   session: Session;
@@ -53,7 +53,7 @@ export default function FormOnboarding({
   const { update: updateSession } = useSession({ required: true });
 
   const [isPending, startPending] = useTransition();
-  const [errors, setErrors] = useState<readonly GraphQLError[]>([]);
+  const [errors, setErrors] = useState<ServerActionError[]>([]);
 
   const submitRef = useRef<HTMLButtonElement>(null);
 
@@ -66,16 +66,16 @@ export default function FormOnboarding({
 
   const onValid = (formValues: OnBoardingSchema) => {
     startPending(async () => {
-      const { data: completeProfileResult, errors } = await completeProfile({
+      const completeProfileResult = await completeProfile({
         userId: session!.user!.id!,
         gender: formValues.gender as UserGenderType
       });
 
-      if (errors) {
-        setErrors(errors);
-      } else {
-        await updateSession(completeProfileResult?.updateUserProfile)
+      if (completeProfileResult.success) {
+        await updateSession(completeProfileResult?.data?.updateUserProfile)
         router.refresh();
+      } else {
+        setErrors(completeProfileResult.error);
       }
     });
   };
@@ -84,8 +84,10 @@ export default function FormOnboarding({
     <Card className="w-full max-w-md mx-5 sm:mx-auto md:max-w-md lg:max-w-lg xl:max-w-lg rounded-md">
       <CardHeader>
         <CardTitle className='flex flex-col gap-4'>
-          {errors.map(({ message }) => (
+          {errors.map(({ code, message }) => (
             <Alert key={message} variant="destructive">
+              <AlertCircle className='h-5 w-5' />
+              <AlertTitle className='capitalize'>{code}!</AlertTitle>
               <AlertDescription>{message}</AlertDescription>
             </Alert>
           ))}
