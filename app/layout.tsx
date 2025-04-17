@@ -2,12 +2,16 @@ import "./globals.css";
 
 import Providers from "@/core/components/providers/providers";
 import { notoSans, notoSansMono } from "@/core/configs/fonts";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
   title: "ChatIO",
-  description: "Random chat to anonymous people"
+  description: "Random chat to anonymous people",
 };
+
+export const viewport: Viewport = {
+  maximumScale: 1
+}
 
 export default function RootLayout({
   children
