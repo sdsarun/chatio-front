@@ -81,8 +81,7 @@ export default function FormOnboarding({
   };
 
   return (
-    <Card className="w-[448px]">
-      {JSON.stringify(form.formState.errors.gender?.message)}
+    <Card className="w-full max-w-md mx-5 sm:mx-auto md:max-w-md lg:max-w-lg xl:max-w-lg rounded-md">
       <CardHeader>
         <CardTitle className='flex flex-col gap-4'>
           {errors.map(({ message }) => (
@@ -98,7 +97,7 @@ export default function FormOnboarding({
         <Form {...form}>
           <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onValid)}>
             <h1 className="font-bold">I am:</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
               <FormField
                 control={form.control}
                 name="gender"
@@ -110,7 +109,6 @@ export default function FormOnboarding({
                       size={"lg"}
                       variant={form.watch("gender") === UserGenderType.Male ? "default" : "outline"}
                       onClick={() => field.onChange(UserGenderType.Male)}
-                      disabled={isPending}
                     >
                       <Mars />
                       Male
@@ -129,7 +127,6 @@ export default function FormOnboarding({
                       size={"lg"}
                       variant={form.watch("gender") === UserGenderType.Female ? "default" : "outline"}
                       onClick={() => field.onChange(UserGenderType.Female)}
-                      disabled={isPending}
                     >
                       <Venus />
                       Female
@@ -150,7 +147,6 @@ export default function FormOnboarding({
                         form.watch("gender") === UserGenderType.RatherNotSay ? "default" : "outline"
                       }
                       onClick={() => field.onChange(UserGenderType.RatherNotSay)}
-                      disabled={isPending}
                     >
                       <VenusAndMars />
                       Rather not say

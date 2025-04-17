@@ -56,23 +56,14 @@ function validateEnvAndFreeze<T extends yup.AnyObject>(
   }
 }
 
-const publicEnv = validateEnvAndFreeze(
-  {
-    hostChatioBackend: process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL || "http://localhost:3301"
-  },
-  publicEnvSchema
-);
+const publicEnv = validateEnvAndFreeze({
+  hostChatioBackend: process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL || "http://localhost:3301"
+}, publicEnvSchema);
 
-let privateEnv: PrivateEnv | undefined;
-if (typeof window === "undefined") {
-  privateEnv = validateEnvAndFreeze(
-    {
-      googleId: process.env.AUTH_GOOGLE_ID || "",
-      googleSecret: process.env.AUTH_GOOGLE_SECRET || ""
-    },
-    privateEnvSchema
-  );
-}
+const privateEnv: PrivateEnv = validateEnvAndFreeze({
+  googleId: process.env.AUTH_GOOGLE_ID || "",
+  googleSecret: process.env.AUTH_GOOGLE_SECRET || "",
+}, privateEnvSchema);
 
 const isProduction: boolean = process.env.NODE_ENV === "production";
 const isDevelopment: boolean = process.env.NODE_ENV === "development";
