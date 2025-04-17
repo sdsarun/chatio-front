@@ -18,11 +18,12 @@ function AppLogo({
     <div className={cn("flex items-center gap-1", rootClassName)}>
       <MessageCircleQuestion 
         {...iconProps} 
-        className={cn("w-5 h-5", iconProps?.className)} 
+        className={cn(iconProps?.className)} 
+        strokeWidth={2.5}
       />
       <p 
         {...textProps}
-        className={cn("text-base font-extrabold", textProps?.className)}
+        className={cn("text-2xl font-mono font-bold", textProps?.className)}
       >
         {text}
       </p>
