@@ -81,7 +81,7 @@ export default function FormOnboarding({
   };
 
   return (
-    <Card className="w-[448px]">
+    <Card className="w-full max-w-md mx-5 sm:mx-auto md:max-w-md lg:max-w-lg xl:max-w-lg rounded-md">
       <CardHeader>
         <CardTitle className='flex flex-col gap-4'>
           {errors.map(({ message }) => (
@@ -97,7 +97,7 @@ export default function FormOnboarding({
         <Form {...form}>
           <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onValid)}>
             <h1 className="font-bold">I am:</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
               <FormField
                 control={form.control}
                 name="gender"
