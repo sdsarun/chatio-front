@@ -4,19 +4,19 @@ import type { PageProps } from "@/core/types/next";
 
 export type SignInPageProps = PageProps<undefined, {
   callbackUrl?: string;
-  error?: string;
+  code?: string;
 }>
 
 export default async function SignInPage({
   searchParams
 }: SignInPageProps) {
-  const { callbackUrl, error } = await searchParams;
+  const { callbackUrl, code } = await searchParams;
 
   return (
     <div className="flex-1 flex justify-center items-center">
       <FormSignIn
         callbackUrl={callbackUrl}
-        error={error}
+        errorMessage={code}
       />
     </div>
   );

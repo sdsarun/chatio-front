@@ -1,7 +1,7 @@
 "use client";
 
 // core
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
 
@@ -20,13 +20,14 @@ import { Alert, AlertDescription } from "@/core/components/ui/alert";
 
 export type FormSignInProps = {
   callbackUrl?: string;
-  error?: string;
+  errorMessage?: string;
 };
 
-export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
+export default function FormSignIn({ callbackUrl, errorMessage }: FormSignInProps) {
   const router = useRouter();
+  const pathname = usePathname()
 
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(error);
+  const [internalErrorMessage, setInternalErrorMessage] = useState<string | undefined>(errorMessage);
   const [socialSignInLoading, setSocialSignInLoading] = useState<string | null>(null);
   const [isGuestSignInPending, startGuestSignInPending] = useTransition();
 
@@ -44,7 +45,10 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
         return router.refresh();
       }
 
-      setErrorMessage(signInError?.code);
+      if (signInError?.code) {
+        setInternalErrorMessage(signInError.code);
+        router.replace(pathname.concat(`?code=${encodeURIComponent(signInError.code)}`));
+      }
     });
   };
 
@@ -52,9 +56,9 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
     <Card className="w-full max-w-md mx-5 sm:mx-auto md:max-w-md lg:max-w-lg xl:max-w-lg rounded-md">
       <CardHeader>
         <CardTitle className="flex flex-col gap-4">
-          {errorMessage && (
+          {internalErrorMessage && (
             <Alert variant="destructive">
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertDescription>{internalErrorMessage}</AlertDescription>
             </Alert>
           )}
           <h1>Welcome to ChatIO</h1>

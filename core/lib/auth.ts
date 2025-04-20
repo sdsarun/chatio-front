@@ -19,7 +19,6 @@ const EXCLUDED_PATHS_REGEX: RegExp = /^\/(api|_next\/static|_next\/image|favicon
 class GuestSignInError extends CredentialsSignin {
   constructor(code: string) {
     super();
-    this.name = "GuestSignInError"
     this.code = code;
     this.message = code;
     this.stack = undefined;
@@ -140,10 +139,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   }
                 }
               } else {
-                return `/auth/signin?error=${encodeURIComponent(response.message)}`;
+                return `/auth/signin?code=${encodeURIComponent(response.message)}`;
               }
             } catch {
-              return `/auth/signin?error=${encodeURIComponent("Google sign-in failed. Please try again later.")}`;
+              return `/auth/signin?code=${encodeURIComponent("Google sign-in failed. Please try again later.")}`;
             }
 
             break;
