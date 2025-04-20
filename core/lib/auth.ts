@@ -65,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/auth/signin",
     newUser: "/auth/new-user",
+    error: "/auth/error"
   },
   callbacks: {
     async authorized({ request, auth }) {
