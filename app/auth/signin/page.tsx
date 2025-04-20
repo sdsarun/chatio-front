@@ -13,11 +13,11 @@ export default async function SignInPage({
   const { callbackUrl, code } = await searchParams;
 
   return (
-    <div className="flex-1 flex justify-center items-center">
+    <main className="flex-1 flex justify-center items-center">
       <FormSignIn
         callbackUrl={callbackUrl}
         errorMessage={code}
       />
-    </div>
+    </main>
   );
 }
