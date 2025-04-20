@@ -1,6 +1,6 @@
 // core
 import { type JWT } from "next-auth/jwt";
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
@@ -16,6 +16,16 @@ import type { UserInfoQuery } from "@/core/services/graphql/graphql";
 
 const EXCLUDED_PATHS_REGEX: RegExp = /^\/(api|_next\/static|_next\/image|favicon\.ico|sitemap\.xml|robots\.txt)/;
 
+class GuestSignInError extends CredentialsSignin {
+  constructor(code: string) {
+    super();
+    this.name = "GuestSignInError"
+    this.code = code;
+    this.message = code;
+    this.stack = undefined;
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -23,20 +33,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       id: "guest-credential",
       name: "Guest Credential",
       async authorize() {
-        const response = await guestSignIn();
-        if (response.success) {
-          const { accessToken, accessTokenExpInMS } = response.data;
-          const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
-          return {
-            userInfo,
-            token: {
-              accessToken,
-              accessTokenExpInMS
-            }
-          } as any;
-        }
+        try {
+          const response = await guestSignIn();
+          if (response.success) {
+            const { accessToken, accessTokenExpInMS } = response.data;
+            const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
+            return {
+              userInfo,
+              token: {
+                accessToken,
+                accessTokenExpInMS
+              }
+            } as any;
+          }
 
-        return null;
+          return null;
+        } catch {
+          throw new GuestSignInError("Guest sign-in failed. Please try again later.");
+        }
       }
     }),
     Google({
@@ -110,23 +124,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         switch (provider) {
           case "google": {
-            const response = await googleSignIn({ idToken: account.id_token! });
-            if (response.success) {
-              const { accessToken, accessTokenExpInMS } = response.data;
-              const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
+            try {
+              const response = await googleSignIn({ idToken: account.id_token! });
+              if (response.success) {
+                const { accessToken, accessTokenExpInMS } = response.data;
+                const { userInfo } = jwtDecode<{ userInfo: UserInfoQuery["user"] }>(accessToken);
 
-              if (profile) {
-                profile.internal = {
-                  userInfo,
-                  token: {
-                    accessToken,
-                    accessTokenExpInMS
+                if (profile) {
+                  profile.internal = {
+                    userInfo,
+                    token: {
+                      accessToken,
+                      accessTokenExpInMS
+                    }
                   }
                 }
+              } else {
+                return `/auth/signin?error=${encodeURIComponent(response.message)}`;
               }
-            } else {
-              return `/auth/signin?error=${response.message}`;
+            } catch {
+              return `/auth/signin?error=${encodeURIComponent("Google sign-in failed. Please try again later.")}`;
             }
+
             break;
           }
           case "guest-credential": {

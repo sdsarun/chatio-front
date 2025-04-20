@@ -26,6 +26,7 @@ export type FormSignInProps = {
 export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
   const router = useRouter();
 
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(error);
   const [socialSignInLoading, setSocialSignInLoading] = useState<string | null>(null);
   const [isGuestSignInPending, startGuestSignInPending] = useTransition();
 
@@ -38,8 +39,12 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
   const handleCredentialSignIn = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const providerName = event.currentTarget.name;
     startGuestSignInPending(async () => {
-      await signIn(providerName, { redirect: !!callbackUrl, redirectTo: callbackUrl });
-      router.refresh();
+      const signInError = await signIn(providerName, { redirect: !!callbackUrl, redirectTo: callbackUrl });
+      if (!signInError) {
+        return router.refresh();
+      }
+
+      setErrorMessage(signInError?.code);
     });
   };
 
@@ -47,9 +52,9 @@ export default function FormSignIn({ callbackUrl, error }: FormSignInProps) {
     <Card className="w-full max-w-md mx-5 sm:mx-auto md:max-w-md lg:max-w-lg xl:max-w-lg rounded-md">
       <CardHeader>
         <CardTitle className="flex flex-col gap-4">
-          {error && (
+          {errorMessage && (
             <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
           <h1>Welcome to ChatIO</h1>
