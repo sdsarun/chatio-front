@@ -2,13 +2,22 @@
   "name": "chatio-front",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Sarun Daunghirun",
+    "email": "sdsarun@outlook.com",
+    "url": "https://sdsarun.dev"
+  },
   "scripts": {
     "dev": "next dev --turbopack -p 3300",
     "build": "next build",
     "start": "next start -p 3300",
     "lint": "next lint",
     "gql:generate": "graphql-codegen --config gql-codegen.ts",
-    "gql:generate:watch": "graphql-codegen --config gql-codegen.ts --watch"
+    "gql:generate:watch": "graphql-codegen --config gql-codegen.ts --watch",
+    "release": "npx standard-version",
+    "release:patch": "npx standard-version --release-as patch",
+    "release:minor": "npx standard-version --release-as minor",
+    "release:major": "npx standard-version --release-as major"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
