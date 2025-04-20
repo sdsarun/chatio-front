@@ -1,0 +1,65 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+input CreateUserIfNotExistsInput {
+  aka: String
+  gender: UserGenderType
+  role: UserRoleType!
+  username: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Mutation {
+  createUserIfNotExists(createUserIfNotExistsInput: CreateUserIfNotExistsInput!): User!
+  updateUserProfile(id: ID!, updateUserData: UpdateUserProfileInput!): User!
+}
+
+type Query {
+  user(aka: String, userId: ID, username: String): User
+}
+
+input UpdateUserProfileInput {
+  aka: String
+  gender: UserGenderType
+}
+
+type User {
+  aka: String!
+  createdAt: DateTime
+  deletedAt: DateTime
+  id: ID!
+  isActive: Boolean
+  updatedAt: DateTime
+  userGender: UserGender
+  userGenderId: String
+  userRole: UserRole
+  userRoleId: String
+  username: String!
+}
+
+type UserGender {
+  id: ID!
+  name: String!
+}
+
+enum UserGenderType {
+  FEMALE
+  MALE
+  RATHER_NOT_SAY
+}
+
+type UserRole {
+  id: ID!
+  name: String!
+}
+
+enum UserRoleType {
+  GUEST
+  REGISTERED
+}
