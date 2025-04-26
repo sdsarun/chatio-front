@@ -80,7 +80,7 @@ function ButtonSelectGroup({
         return (
           <Button
             key={value}
-            variant={isActive ? "default" : "outline"}
+            variant={isActive ? "default" : "ghost"}
             size={itemSize || size}
             className={cn(
               className,
