@@ -25,6 +25,8 @@ export type ButtonSelectGroupProps = {
   onChange?: (selectedKeys: ButtonSelectGroupValue[]) => void;
   activeClassName?: string;
   inactiveClassName?: string;
+  activeButtonVariant?: React.ComponentProps<typeof Button>["variant"];
+  inactiveButtonVariant?: React.ComponentProps<typeof Button>["variant"];
 }
 
 function ButtonSelectGroup({
@@ -38,6 +40,8 @@ function ButtonSelectGroup({
   onChange,
   activeClassName,
   inactiveClassName,
+  activeButtonVariant = "default",
+  inactiveButtonVariant = "ghost",
 }: ButtonSelectGroupProps) {
   const [internalSelected, setInternalSelected] = useState<ButtonSelectGroupValue[]>(defaultValue || []);
 
@@ -80,7 +84,7 @@ function ButtonSelectGroup({
         return (
           <Button
             key={value}
-            variant={isActive ? "default" : "ghost"}
+            variant={isActive ? activeButtonVariant : inactiveButtonVariant}
             size={itemSize || size}
             className={cn(
               className,
@@ -92,6 +96,7 @@ function ButtonSelectGroup({
                 onClick(event);
               }
             }}
+            suppressHydrationWarning
             {...props}
           >
             {label}
