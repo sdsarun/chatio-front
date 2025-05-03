@@ -7,8 +7,8 @@ import FormOnboarding from '@/features/auth/components/form-onboarding';
 export default async function page() {
   const session = await auth();
   return (
-    <div className="flex-1 flex justify-center items-center">
+    <main className="flex-1 flex justify-center items-center">
       <FormOnboarding session={session!} />
-    </div>
+    </main>
   )
 }
