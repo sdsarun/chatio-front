@@ -16,7 +16,8 @@ const privateEnvSchema = yup
     googleSecret: yup
       .string()
       .required("Google Client Secret is required")
-      .min(1, "Google Client Secret cannot be empty")
+      .min(1, "Google Client Secret cannot be empty"),
+    publicApiKey: yup.string().required("Public api key is required")
   })
   .required();
 
@@ -56,13 +57,14 @@ function validateEnvAndFreeze<T extends yup.AnyObject>(
   }
 }
 
-const publicEnv = validateEnvAndFreeze({
+const publicEnv: PublicEnv = validateEnvAndFreeze({
   hostChatioBackend: process.env.NEXT_PUBLIC_HOST_CHATIO_BACKEND_URL || "http://localhost:3301"
 }, publicEnvSchema);
 
 const privateEnv: PrivateEnv = validateEnvAndFreeze({
   googleId: process.env.AUTH_GOOGLE_ID || "",
   googleSecret: process.env.AUTH_GOOGLE_SECRET || "",
+  publicApiKey: process.env.PUBLIC_API_KEY || "",
 }, privateEnvSchema);
 
 const isProduction: boolean = process.env.NODE_ENV === "production";
