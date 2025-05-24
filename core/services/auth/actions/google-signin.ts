@@ -1,7 +1,7 @@
 "use server"
 
 // core
-import { chatioRestApi } from "@/core/services/api";
+import { chatioRestApi } from "@/core/services/server-api";
 
 // types
 import type { ApiResponse } from "@/core/types/service";
