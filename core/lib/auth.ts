@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import { jwtDecode } from "jwt-decode"
 
 // api
-import { googleOAuthApi } from "@/core/services/api";
+import { googleOAuthApi } from "@/core/services/client-api";
 import { googleSignIn } from "@/core/services/auth/actions/google-signin";
 import { guestSignIn } from "@/core/services/auth/actions/guest-signin";
 
