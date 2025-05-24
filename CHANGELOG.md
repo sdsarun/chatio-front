@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/sdsarun/chatio-front/compare/v0.1.1...v0.2.0) (2025-05-24)
+
+
+### Features
+
+* **chat:** init chat app ([7c06a9e](https://github.com/sdsarun/chatio-front/commit/7c06a9e02c31ab13f464784f788f380d2b389413))
+* **infra:** add public api key ([aec26ac](https://github.com/sdsarun/chatio-front/commit/aec26acda413ed8baf062dfe56a72c442421ec61))
+* **ui:** add alert dialog ([ed3d2fd](https://github.com/sdsarun/chatio-front/commit/ed3d2fd9bdd2f5ab762352739ee8143f972a3917))
+* **ui:** add badge ([77762a6](https://github.com/sdsarun/chatio-front/commit/77762a63de43e05a72ee3d7f717bd6647b049a49))
+* **ui:** add button select group ([6854438](https://github.com/sdsarun/chatio-front/commit/68544380b93a3d990b71683ed722dc764cb07de6))
+* **ui:** add copy button ([2cadc45](https://github.com/sdsarun/chatio-front/commit/2cadc45d7c04ad5751448768ac4973d387ff0cbc))
+* **ui:** add drawer ([928e9bd](https://github.com/sdsarun/chatio-front/commit/928e9bd96f5271cf566e043a48ffef6f3529dec0))
+* **ui:** add drawer dialog ([047f700](https://github.com/sdsarun/chatio-front/commit/047f7007414483be6a1e28a02550d9e11230fda9))
+* **ui:** add loading ([c72a24f](https://github.com/sdsarun/chatio-front/commit/c72a24f239bc9e327bd0876771b656456f943f09))
+* **ui:** add props customize active and inactive ([e1141db](https://github.com/sdsarun/chatio-front/commit/e1141db599cf3326cb6e815db3c2a3a16846158d))
+* **ui:** add sepator support children ([d9457d0](https://github.com/sdsarun/chatio-front/commit/d9457d0b0729425845b679ae110a6c741f43b3e3))
+* **ui:** add switch ([f17226c](https://github.com/sdsarun/chatio-front/commit/f17226caaf201a6b0b69697ecb237a656cac7faa))
+* **ui:** add tabs ([e97c586](https://github.com/sdsarun/chatio-front/commit/e97c5869e40b909a13a9ae842ceef7628c5d5fe6))
+* **ui:** add useIsMounted ([af3b243](https://github.com/sdsarun/chatio-front/commit/af3b243a3c6fe3ef5ed285bf65bea8a264a3d404))
+
+
+### Bug Fixes
+
+* **chat:** remove page ([70078d7](https://github.com/sdsarun/chatio-front/commit/70078d7229e5b93bf0ae7961a0b158f06536f5c0))
+* **ui:** add config button variants ([3d77818](https://github.com/sdsarun/chatio-front/commit/3d778188a59566a2be99f901d2bc5bc707e509b4))
+* **ui:** add more variant size for button ([5a453e7](https://github.com/sdsarun/chatio-front/commit/5a453e723d3cf7bf3f1000105a53c87ddbf0f88a))
+* **ui:** change default props active ([b64251d](https://github.com/sdsarun/chatio-front/commit/b64251de1811c9501b24663b56dc32cf6f281317))
+* **ui:** change default props active ([8bb9394](https://github.com/sdsarun/chatio-front/commit/8bb939452f97ba15beec480e63a65d2f0a85c728))
+
 ### 0.1.1 (2025-04-20)
 
 
