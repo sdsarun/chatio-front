@@ -1,4 +1,4 @@
-import { publicEnv } from "@/core/constants/env";
+import { privateEnv, publicEnv } from "@/core/constants/env";
 import fetcherFactory from "@/core/utils/common/fetcher";
 
 export const googleOAuthApi = fetcherFactory("https://oauth2.googleapis.com");
@@ -8,4 +8,8 @@ export const chatioGraphQLApi = fetcherFactory(publicEnv.hostChatioBackend, {
     Accept: 'application/graphql-response+json'
   }
 });
-export const chatioRestApi = fetcherFactory(publicEnv.hostChatioBackend);
+export const chatioRestApi = fetcherFactory(publicEnv.hostChatioBackend, {
+  defaultHeaders: {
+    "public-api-key": privateEnv.publicApiKey,
+  }
+});
