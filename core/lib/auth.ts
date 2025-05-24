@@ -1,4 +1,4 @@
-import { googleOAuthApi } from "@/core/services/api";
+import { googleOAuthApi } from "@/core/services/client-api";
 import NextAuth from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Google from "next-auth/providers/google";
