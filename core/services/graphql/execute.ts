@@ -1,5 +1,5 @@
 // core
-import { chatioGraphQLApi } from '@/core/services/api'
+import { chatioGraphQLApi } from '@/core/services/client-api';
 
 // types
 import type { TypedDocumentString } from './graphql'
