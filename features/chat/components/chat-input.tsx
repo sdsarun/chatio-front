@@ -71,6 +71,7 @@ export default function ChatInput({
                     placeholder='Message'
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
+                    maxLength={1024}
                   />
                 </FormControl>
                 <Button

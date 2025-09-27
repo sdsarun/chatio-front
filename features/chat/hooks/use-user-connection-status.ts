@@ -7,7 +7,7 @@ import useSocketEvent from "@/core/hooks/use-socket-event";
 import chatSocketApi from "@/features/chat/services/chat-socket-api";
 
 // constants
-import { UserEvents } from "@/features/chat/constants/user-events.constant";
+import { UserEvent } from "@/features/chat/constants/user-events.constant";
 import { UserConnectionStatus } from "@/features/chat/constants/user-connection-status.constant";
 import { useEffect, useState } from "react";
 
@@ -32,7 +32,7 @@ const useUserConnectionStatus = ({
   const { data } = useSession();
   const { socket } = useSocket();
 
-  const isAfk = useIdle({ timeout: 2000 });
+  const isAfk = useIdle({ timeout: 1000 * 60 * 15 }); // 15 min to afk
 
   const currentSignedUser = data?.user;
   const isCurrentUser = user?.id === currentSignedUser?.id;
@@ -42,7 +42,7 @@ const useUserConnectionStatus = ({
   );
 
   useSocketEvent({
-    event: UserEvents.GetUserStatusByUserId,
+    event: UserEvent.GetUserStatusByUserId,
     initial: async () => {
       const { data: userConnection } = await chatSocketApi.getUserStatusByUserId(socket, {
         userId: user?.id || ""

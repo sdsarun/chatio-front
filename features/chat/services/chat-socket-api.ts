@@ -4,7 +4,7 @@ import { socketRequest } from "@/core/utils/socket";
 
 // constants
 import { ChatEvent } from "@/features/chat/constants/chat-events";
-import { UserEvents } from "@/features/chat/constants/user-events.constant";
+import { UserEvent } from "@/features/chat/constants/user-events.constant";
 
 // types
 import type { SendMessageDTO } from "@/features/chat/types/send-message";
@@ -24,15 +24,16 @@ const chatSocketApi = {
   getUserStatusByUserId: (socket: Socket, dto: GetUserStatusByUserIdDTO) =>
     socketRequest<GetUserStatusByUserIdDTO, UserConnection>(
       socket,
-      UserEvents.GetUserStatusByUserId,
+      UserEvent.GetUserStatusByUserId,
       dto
     ),
   updateUserConnectionStatus: (socket: Socket, dto: UpdateUserConnectionStatusDTO) =>
     socketRequest<UpdateUserConnectionStatusDTO, UserConnection>(
       socket,
-      UserEvents.UpdateUserConnectionStatus,
+      UserEvent.UpdateUserConnectionStatus,
       dto
-    )
+    ),
+  skipStranger: (socket: Socket, dto: any) => socketRequest(socket, ChatEvent.SkipStranger, dto)
 } as const;
 
 export default chatSocketApi;

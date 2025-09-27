@@ -1,11 +1,14 @@
 "use client";
 
 // core
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // components
 import ChatInput from "@/features/chat/components/chat-input";
 import UserAvatar from "@/features/chat/components/user-avatar";
+import { Button } from "@/core/components/ui/button";
 import { ChatMessage, ChatMessageHeader } from "@/features/chat/components/chat-message";
 import { UserChatingSkeleton } from "@/features/chat/components/skeleton";
 
@@ -25,9 +28,8 @@ import chatSocketApi from "@/features/chat/services/chat-socket-api";
 // types
 import type { Session } from "next-auth";
 import type { SendMessageDTO } from "@/features/chat/types/send-message";
-import type { Message } from "@/features/chat/types/matching";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import type { MatchingStrangerResponse, Message } from "@/features/chat/types/matching";
+import type { MatchingStatus } from "@/features/chat/components/matching-chat";
 
 type ChatProps = {
   rootClassName?: string;
@@ -39,6 +41,10 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
   const router = useRouter();
   const { socket } = useSocket();
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const [buttonState, setButtonState] = useState<"start" | "skip" | "confirm">("start");
+  const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>("idle");
   const [messages, setMessages] = useState<Message[]>([]);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
@@ -65,12 +71,26 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
     },
     onEvent: (newMessages: Message[]) => {
       setMessages((prevMessages) => [...newMessages, ...prevMessages]);
+      chatContainerRef.current?.scrollTo({
+        top: chatContainerRef.current.scrollHeight
+      });
+    }
+  });
+
+  useSocketEvent({
+    event: ChatEvent.MatchedStranger,
+    onEvent: ({ status, conversation }: MatchingStrangerResponse) => {
+      setMatchingStatus(status as MatchingStatus);
+      router.replace(`/c/${conversation.id}`);
     }
   });
 
   return (
     <section className={cn("flex flex-col flex-1", rootClassName)}>
-      <section className="flex flex-col-reverse h-[calc(100dvh-137px)] overflow-y-auto">
+      <section
+        ref={chatContainerRef}
+        className="flex flex-col-reverse h-[calc(100dvh-137px)] overflow-y-auto"
+      >
         {initialLoading ? (
           <UserChatingSkeleton />
         ) : (
@@ -93,6 +113,44 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
         )}
       </section>
       <div className="flex items-center gap-2">
+        <Button
+          isLoading={matchingStatus === "matching"}
+          variant={buttonState === "confirm" ? "destructive" : "default"}
+          onClick={async () => {
+            if (buttonState === "start") {
+              setMatchingStatus("matching");
+              const response = (await socket.emitWithAck(ChatEvent.MatchingStranger)) as Pick<
+                MatchingStrangerResponse,
+                "status"
+              >;
+              setMatchingStatus(response?.status as MatchingStatus);
+              return;
+            }
+
+            if (buttonState === "skip") {
+              setButtonState("confirm");
+              return;
+            }
+
+            if (buttonState === "confirm") {
+              try {
+                await chatSocketApi.skipStranger(socket, {
+                  conversationId,
+                  userId: user?.id
+                });
+
+                setMessages([]);
+                setButtonState("start");
+                toast("Chat skipped. Start a new chat.");
+              } catch (err: any) {
+                toast(err?.message || "Failed to skip chat");
+                setButtonState("start");
+              }
+            }
+          }}
+        >
+          {buttonState === "start" ? "Start" : buttonState === "skip" ? "Skip" : "Confirm"}
+        </Button>
         <ChatInput
           onSubmit={async ({ content }, form) => {
             const sendMessageDTO: SendMessageDTO = {

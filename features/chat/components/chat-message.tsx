@@ -1,5 +1,8 @@
 // core
-import React from 'react'
+import React from "react";
+
+// utils
+import { insertHiddenSpaces } from "@/core/utils/common/string";
 
 type ChatMessageHeaderProps = {
   aka?: string;
@@ -9,37 +12,30 @@ function ChatMessageHeader({ aka, timestamp }: ChatMessageHeaderProps) {
   const datetime = timestamp instanceof Date ? timestamp.toLocaleString() : timestamp;
   const datetimeDisplay = timestamp instanceof Date ? timestamp.toLocaleString() : timestamp;
   return (
-    <div className='flex items-center gap-2'>
-      <h3 className='font-bold'>{aka}</h3>
+    <div className="flex items-center gap-2">
+      <h3 className="font-bold">{aka}</h3>
       {timestamp && (
-        <time
-          className='text-xs text-muted-foreground font-semibold '
-          dateTime={datetime}
-        >{datetimeDisplay}</time>
+        <time className="text-xs text-muted-foreground font-semibold " dateTime={datetime}>
+          {datetimeDisplay}
+        </time>
       )}
     </div>
-  )
+  );
 }
 
 type ChatMessageProps = React.ComponentPropsWithRef<"div"> & {
   message?: React.ReactNode;
 };
-function ChatMessage({
-  message,
-  ...props
-}: ChatMessageProps) {
+function ChatMessage({ message, ...props }: ChatMessageProps) {
   if (typeof message === "string") {
     return (
       <div {...props}>
-        <span className='whitespace-pre-wrap'>{message}</span>
+        <span className="whitespace-break-spaces break-words">{insertHiddenSpaces(message)}</span>
       </div>
-    )
+    );
   }
 
   return null;
 }
 
-export {
-  ChatMessageHeader,
-  ChatMessage
-}
+export { ChatMessageHeader, ChatMessage };
