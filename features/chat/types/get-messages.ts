@@ -5,7 +5,3 @@ export type GetMessagesDTO = {
   offset?: number;
   limit?: number;
 }
-
-export type GetMessagesResponse = {
-
-}

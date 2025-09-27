@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
 // core
-import React, { useEffect, useRef, useState } from 'react'
-import { useSocket } from '@/core/components/providers/socket-io-client';
+import React, { useEffect, useState } from "react";
+import { useSocket } from "@/core/components/providers/socket-io-client";
 
 // components
-import ChatInput from '@/features/chat/components/chat-input';
-import UserAvatar from '@/features/chat/components/user-avatar';
-import { ChatMessage, ChatMessageHeader } from '@/features/chat/components/chat-message';
+import ChatInput from "@/features/chat/components/chat-input";
+import UserAvatar from "@/features/chat/components/user-avatar";
+import { ChatMessage, ChatMessageHeader } from "@/features/chat/components/chat-message";
 
 // utils
-import { cn } from '@/core/lib/utils';
-import { getMessages, sendMessage } from '@/features/chat/utils/chat-actions';
+import { cn } from "@/core/lib/utils";
+import { getMessages, sendMessage } from "@/features/chat/utils/chat-actions";
 
 // constants
-import { ChatEvent } from '@/features/chat/constants/chat-events';
+import { ChatEvent } from "@/features/chat/constants/chat-events";
 
 // types
-import type { Session } from 'next-auth';
-import type { SendMessageDTO } from '@/features/chat/types/send-message';
+import type { Session } from "next-auth";
+import type { SendMessageDTO } from "@/features/chat/types/send-message";
+import type { Message } from "@/features/chat/types/matching";
 
 type ChatProps = {
   rootClassName?: string;
@@ -26,31 +27,29 @@ type ChatProps = {
   conversationId?: string;
 };
 
-export default function Chat({
-  rootClassName,
-  user,
-  conversationId,
-}: ChatProps) {
+export default function Chat({ rootClassName, user, conversationId }: ChatProps) {
   const { socket } = useSocket();
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  console.log("[LOG] - chat.tsx:38 - Chat - initialLoading:", initialLoading);
 
   useEffect(() => {
     async function initial() {
       if (conversationId) {
         const response = await getMessages(socket, { conversationId });
+        console.log("[LOG] - chat.tsx:40 - initial - response:", response);
         setMessages(response);
         setInitialLoading(false);
       }
     }
 
     function onGetMessages(newMessage: any) {
-      setMessages((prevMessages) => [...newMessage, ...prevMessages])
+      setMessages((prevMessages) => [...newMessage, ...prevMessages]);
     }
 
     function attachEvents() {
-      socket.on(ChatEvent.GetMessages, onGetMessages)
+      socket.on(ChatEvent.GetMessages, onGetMessages);
     }
 
     function detachEvents() {
@@ -58,44 +57,40 @@ export default function Chat({
     }
 
     attachEvents();
-    initial()
-    return () => detachEvents()
+    initial();
+    return () => detachEvents();
   }, [conversationId, socket]);
 
   return (
     <section className={cn("flex flex-col flex-1", rootClassName)}>
-      <section className='flex flex-col-reverse h-[calc(100dvh-137px)] overflow-y-auto'>
+      <section className="flex flex-col-reverse h-[calc(100dvh-137px)] overflow-y-auto">
         {messages?.map?.((message) => (
-          <div key={message?.id} className="flex gap-4 mt-4" >
+          <div key={message?.id} className="flex gap-4 mt-4">
             <div>
-              <UserAvatar
-              />
+              <UserAvatar user={message?.sender} />
             </div>
             <div className="flex flex-col flex-1">
               <ChatMessageHeader
                 aka={message?.sender?.aka}
                 timestamp={new Date(message?.sentAt).toLocaleString()}
               />
-
-              <ChatMessage
-                message={message?.content}
-              />
+              <ChatMessage message={message?.content} />
             </div>
           </div>
         ))}
       </section>
-      <div className='flex items-center gap-2'>
+      <div className="flex items-center gap-2">
         <ChatInput
           onSubmit={async ({ content }, form) => {
             const sendMessageDTO: SendMessageDTO = {
               content,
               conversationId: conversationId || "",
-              senderId: user?.id || "",
-            }
+              senderId: user?.id || ""
+            };
 
             form.reset();
             const newMessage = await sendMessage(socket, sendMessageDTO);
-            setMessages((prevMessages) => [...newMessage, ...prevMessages])
+            setMessages((prevMessages) => [...newMessage, ...prevMessages]);
           }}
         />
       </div>
