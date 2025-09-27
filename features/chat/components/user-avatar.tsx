@@ -1,17 +1,21 @@
+"use client";
+
 // core
-import React from 'react'
-import type { Session } from 'next-auth';
+import React from "react";
+import type { Session } from "next-auth";
 
 // components
-import { Avatar, AvatarFallback, AvatarImage } from '@/core/components/ui/avatar';
-import { UserStatusIndicator } from '@/features/chat/components/user-status-indicator';
+import { Avatar, AvatarFallback, AvatarImage } from "@/core/components/ui/avatar";
+import { UserStatusIndicator } from "@/features/chat/components/user-status-indicator";
+
+// hooks
+import useUserConnectionStatus from "@/features/chat/hooks/use-user-connection-status";
 
 // utils
-import { cn } from '@/core/lib/utils';
+import { cn } from "@/core/lib/utils";
 
 type UserAvatarProps = {
   user?: Session["user"];
-  userStatus?: React.ComponentProps<typeof UserStatusIndicator>["status"];
   avatarProps?: React.ComponentProps<typeof Avatar>;
   avatarImageProps?: React.ComponentProps<typeof AvatarImage>;
   avatarFallbackProps?: React.ComponentProps<typeof AvatarFallback>;
@@ -27,32 +31,34 @@ export default function UserAvatar({
   avatarImageProps,
   avatarProps,
   dotProps,
-  userStatus,
   rootProps,
   hiddenAvatar,
-  hiddenUserStatus,
+  hiddenUserStatus
 }: UserAvatarProps) {
+  const userConnectionStatus = useUserConnectionStatus({ user });
   return (
-    <div {...rootProps} className={cn('relative inline-block', rootProps?.className)} >
+    <div {...rootProps} className={cn("relative inline-block", rootProps?.className)}>
       {!hiddenAvatar && (
         <Avatar {...avatarProps}>
-          <AvatarImage
-            {...avatarImageProps}
-            src={avatarImageProps?.src || "#"}
-          />
+          <AvatarImage {...avatarImageProps} src={avatarImageProps?.src || "#"} />
           <AvatarFallback
             {...avatarFallbackProps}
-            className={cn('text-xs bg-foreground border-2 border-foreground text-background font-semibold', avatarFallbackProps?.className)}
-          >{user?.aka?.slice(0, 2)?.toUpperCase()}</AvatarFallback>
+            className={cn(
+              "text-xs bg-foreground border-2 border-foreground text-background font-semibold",
+              avatarFallbackProps?.className
+            )}
+          >
+            {user?.aka?.slice(0, 2)?.toUpperCase()}
+          </AvatarFallback>
         </Avatar>
       )}
       {!hiddenUserStatus && (
         <UserStatusIndicator
           {...dotProps}
           placement={dotProps?.placement || "bottom-right"}
-          status={userStatus}
+          status={userConnectionStatus}
         />
       )}
     </div>
-  )
+  );
 }

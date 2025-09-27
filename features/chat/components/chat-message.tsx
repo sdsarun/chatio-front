@@ -31,7 +31,7 @@ function ChatMessage({
   if (typeof message === "string") {
     return (
       <div {...props}>
-        <span>{message}</span>
+        <span className='whitespace-pre-wrap'>{message}</span>
       </div>
     )
   }
