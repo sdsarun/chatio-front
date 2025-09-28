@@ -119,11 +119,8 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
           onClick={async () => {
             if (buttonState === "start") {
               setMatchingStatus("matching");
-              const response = (await socket.emitWithAck(ChatEvent.MatchingStranger)) as Pick<
-                MatchingStrangerResponse,
-                "status"
-              >;
-              setMatchingStatus(response?.status as MatchingStatus);
+              const response = await chatSocketApi.matchingStranger(socket);
+              setMatchingStatus(response?.data?.status as MatchingStatus);
               return;
             }
 

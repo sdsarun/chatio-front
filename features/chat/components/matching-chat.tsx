@@ -12,6 +12,9 @@ import { MessagesSquare } from "lucide-react";
 // hooks
 import useSocketEvent from "@/core/hooks/use-socket-event";
 
+// api
+import chatSocketApi from "@/features/chat/services/chat-socket-api";
+
 // constants
 import { ChatEvent } from "@/features/chat/constants/chat-events";
 
@@ -42,11 +45,8 @@ export default function MatchingChat({}: MatchingChatProps) {
         className="h-14 w-80 text-lg"
         onClick={async () => {
           setMatchingStatus("matching");
-          const response = (await socket.emitWithAck(ChatEvent.MatchingStranger)) as Pick<
-            MatchingStrangerResponse,
-            "status"
-          >;
-          setMatchingStatus(response?.status as MatchingStatus);
+          const response = await chatSocketApi.matchingStranger(socket);
+          setMatchingStatus(response?.data?.status as MatchingStatus);
         }}
         isLoading={matchingStatus === "matching"}
       >

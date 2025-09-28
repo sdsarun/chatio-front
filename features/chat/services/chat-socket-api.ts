@@ -9,7 +9,7 @@ import { UserEvent } from "@/features/chat/constants/user-events.constant";
 // types
 import type { SendMessageDTO } from "@/features/chat/types/send-message";
 import type { GetMessagesDTO } from "@/features/chat/types/get-messages";
-import type { Message } from "@/features/chat/types/matching";
+import type { MatchingStrangerResponse, Message } from "@/features/chat/types/matching";
 import type {
   GetUserStatusByUserIdDTO,
   UserConnection
@@ -33,7 +33,12 @@ const chatSocketApi = {
       UserEvent.UpdateUserConnectionStatus,
       dto
     ),
-  skipStranger: (socket: Socket, dto: any) => socketRequest(socket, ChatEvent.SkipStranger, dto)
+  skipStranger: (socket: Socket, dto: any) => socketRequest(socket, ChatEvent.SkipStranger, dto),
+  matchingStranger: (socket: Socket) =>
+    socketRequest<undefined, Pick<MatchingStrangerResponse, "status">>(
+      socket,
+      ChatEvent.MatchingStranger
+    )
 } as const;
 
 export default chatSocketApi;
