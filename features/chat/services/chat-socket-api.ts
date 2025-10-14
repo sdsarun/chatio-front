@@ -38,7 +38,9 @@ const chatSocketApi = {
     socketRequest<undefined, Pick<MatchingStrangerResponse, "status">>(
       socket,
       ChatEvent.MatchingStranger
-    )
+    ),
+  getConverstaionParticipant: (socket: Socket, dto: any) =>
+    socketRequest(socket, ChatEvent.GetConverstaionParticipant, dto)
 } as const;
 
 export default chatSocketApi;

@@ -5,4 +5,5 @@ export enum ChatEvent {
   GetMessages = "chat:get-messages",
   SendMessage = "chat:send-message",
   MessagesRead = "chat:messages-read",
+  GetConverstaionParticipant = "chat:get-conversation-participant"
 }

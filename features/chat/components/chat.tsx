@@ -57,8 +57,10 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
             conversationId,
             requesterId: user?.id
           });
+          console.log("[LOG] - chat.tsx:57 - Chat - error:", error);
+          console.log("[LOG] - chat.tsx:57 - Chat - data:", data);
 
-          if (error && error.statusCode === 403) {
+          if (error) {
             toast(error.message);
             router.replace("/c/new");
           } else {
@@ -149,6 +151,7 @@ export default function Chat({ rootClassName, user, conversationId }: ChatProps)
           {buttonState === "start" ? "Start" : buttonState === "skip" ? "Skip" : "Confirm"}
         </Button>
         <ChatInput
+          disabled
           onSubmit={async ({ content }, form) => {
             const sendMessageDTO: SendMessageDTO = {
               content,
